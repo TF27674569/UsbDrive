@@ -19,4 +19,4 @@
 3. 注意写指令和读取指令是以轮询的方式完成 通过handler发送命令轮询
 
 ### **二、图结构**
-![  ](https://github.com/TF27674569/UsbDrive/driver.png)  
+![  ](https://github.com/TF27674569/UsbDrive/blob/master/driver.png)  

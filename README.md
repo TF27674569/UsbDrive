@@ -7,6 +7,7 @@
 ```java
  OkDriveClient client = new OkDriveClient.Builder(App.application)
                 .timeOut(60000)// 整个指令从开始到结束响应超时时间
+                .intercept()//可以自定义拦截器 比如指令检验等
                 .build();
 ```
 2. 发送指令

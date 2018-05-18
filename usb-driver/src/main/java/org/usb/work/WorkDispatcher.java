@@ -31,7 +31,12 @@ public class WorkDispatcher implements Handler.Callback {
     private static final int PACKAGE_BASE_LENGTH = DATA_LENGTH_INDEX + DATA_LENGTH + END_SIZE;
     private static final int READ_BYTE_SIZE = 100;
 
+    // 每次读取的指令
+    private static byte[] sInstructBuffer = new byte[READ_BYTE_SIZE];
+    // 清空 sInstructBuffer 每次擦除的值
+    private static byte sWipe = 0;
 
+    // 指令集合
     private static List<Instruct> sInstruct = new ArrayList<>();
 
     @Override
@@ -44,6 +49,7 @@ public class WorkDispatcher implements Handler.Callback {
                 sInstruct.remove((Instruct) msg.obj);
                 break;
             case WorkConfig.CLEARN:
+                sInstruct.clear();
                 break;
             case WorkConfig.POLLING:
                 // 解析信息
@@ -62,6 +68,21 @@ public class WorkDispatcher implements Handler.Callback {
         if (!sInstruct.contains(obj)) {
             sInstruct.add(obj);
         }
+        // 发送指令
+        byte[] sendInstruct = obj.getSend();
+        // 拿到发送的指令
+        int real = DriverManager.getInstance().driver().WriteData(sendInstruct, sendInstruct.length);
+
+        // 失败
+        if (real <= 0 ) {
+            // 发送失败
+            PrintUtils.printHex(sendInstruct, "发送数据(十六进制)失败:");
+            // 失败回调
+            obj.getCallback().onError(new RuntimeException("写入单片机失败"));
+            return;
+        }
+
+        PrintUtils.printHex(sendInstruct, "发送数据(十六进制)成功:");
     }
 
 
@@ -72,20 +93,19 @@ public class WorkDispatcher implements Handler.Callback {
      * 轮询读数据
      */
     private void pooling(Message msg) {
-
-        byte[] instruct = new byte[READ_BYTE_SIZE];
-
+        // 擦除缓冲的值
+        Arrays.fill(sInstructBuffer, sWipe);
         // 读取长度
-        int length = DriverManager.getInstance().driver().ReadData(instruct, READ_BYTE_SIZE);
+        int length = DriverManager.getInstance().driver().ReadData(sInstructBuffer, READ_BYTE_SIZE);
         if (length > 0) {
             //截取数组有效长度
-            instruct = Arrays.copyOfRange(instruct, 0, length);
-            if (instruct.length > PACKAGE_BASE_LENGTH) {
+            sInstructBuffer = Arrays.copyOfRange(sInstructBuffer, 0, length);
+            if (sInstructBuffer.length > PACKAGE_BASE_LENGTH) {
                 if (sPartData != null) {
-                    instruct = CRC16X25Util.concatAll(sPartData, instruct);
+                    sInstructBuffer = CRC16X25Util.concatAll(sPartData, sInstructBuffer);
                     sPartData = null;
                 }
-                handleInstruct(instruct);
+                handleInstruct(sInstructBuffer);
             }
         }
         // 接着轮询遍历
@@ -174,7 +194,7 @@ public class WorkDispatcher implements Handler.Callback {
         // 成功回调
         tag.getCallback().onSuccess(packageData);
 
-        // 成功后移除
-        sInstruct.remove(tag);
+        // 成功后移除 移除任务交给拦截器处理
+        // sInstruct.remove(tag);
     }
 }

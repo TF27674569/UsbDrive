@@ -24,6 +24,11 @@ public interface Work {
     void removeInstruct(Instruct instruct);
 
     /**
+     * 清空所有指令
+     */
+    void clearnInstructs( );
+
+    /**
      * 轮询
      */
     void  polling();

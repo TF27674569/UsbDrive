@@ -15,7 +15,7 @@ import cn.wch.ch34xuartdriver.CH34xUARTDriver;
  * Email : 27674569@qq.com
  * Version : 1.0
  */
-public interface Driver {
+public interface Manager {
 
     /**
      * 打开驱动
@@ -42,4 +42,17 @@ public interface Driver {
      * usb转串口驱动
      */
     CH34xUARTDriver driver();
+
+
+    /**
+     * 移除数据
+     *
+     * @param instruct 数据封装对象
+     */
+    void removeInstruct(Instruct instruct);
+
+    /**
+     * 清空池中的对象
+     */
+    void clearnInstructs();
 }

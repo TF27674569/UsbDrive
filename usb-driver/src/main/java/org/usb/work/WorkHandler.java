@@ -38,6 +38,14 @@ public class WorkHandler extends Handler implements Work {
     }
 
     /**
+     * 清空所有指令
+     */
+    @Override
+    public void clearnInstructs() {
+        sendMessage(null, WorkConfig.CLEARN);
+    }
+
+    /**
      * 轮询
      */
     @Override

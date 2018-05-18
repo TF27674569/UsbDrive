@@ -56,6 +56,20 @@ public class PrintUtils {
      */
     public static boolean equals(byte[] byte1, byte[] byte2) {
         // 地址功能码一样则表示一样
-        return byte1[3]==byte2[3]&&byte1[4]==byte2[4];
+        return byte1[3] == byte2[3] && byte1[4] == byte2[4];
+    }
+
+    /**
+     * 完全一样时表示握手
+     */
+    public static boolean beEqualTo(byte[] result, byte[] byteInstruct) {
+        if (result.length != byteInstruct.length) return false;
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] != byteInstruct[1]) {
+                return false;
+            }
+        }
+        return true;
     }
 }

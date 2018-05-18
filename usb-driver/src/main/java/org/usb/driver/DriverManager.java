@@ -18,7 +18,7 @@ import cn.wch.ch34xuartdriver.CH34xUARTDriver;
  * Email : 27674569@qq.com
  * Version : 1.0
  */
-public class DriverManager implements Driver {
+public class DriverManager implements Manager {
     /**********************************************************************************************************************************************************/
     // 配置相关参数
     private static final String ACTION_USB_PERMISSION = "cn.wch.wchusbdriver.USB_PERMISSION";
@@ -123,9 +123,9 @@ public class DriverManager implements Driver {
      */
     @Override
     public void writeInstruct(Instruct instruct) {
-        if (isOpen){
+        if (isOpen) {
             workThread.handler().addInstruct(instruct);
-        }else {
+        } else {
             instruct.getCallback().onError(new DriverInitError());
         }
     }
@@ -136,5 +136,23 @@ public class DriverManager implements Driver {
     @Override
     public CH34xUARTDriver driver() {
         return ch34xUARTDriver;
+    }
+
+    /**
+     * 移除数据
+     *
+     * @param instruct 数据封装对象
+     */
+    @Override
+    public void removeInstruct(Instruct instruct) {
+        workThread.handler().removeInstruct(instruct);
+    }
+
+    /**
+     * 清空池中的对象
+     */
+    @Override
+    public void clearnInstructs() {
+        workThread.handler().clearnInstructs();
     }
 }

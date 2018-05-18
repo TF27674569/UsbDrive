@@ -4,10 +4,11 @@ import android.os.Handler;
 
 import org.usb.Instruct;
 import org.usb.base.Callback;
+import org.usb.driver.DriverManager;
 import org.usb.exception.OutOfTimeError;
 
 /**
- * Description :
+ * Description : 超时拦截器
  * <p/>
  * Created : TIAN FENG
  * Date : 2018/5/17
@@ -39,9 +40,11 @@ public class OutOfTimeIntercept implements Interceptor {
 
         private Callback callback;
         private Handler handler = new Handler();
+        private Instruct instruct;
 
         public OutOfTimeCallback(Instruct instruct) {
             this.callback = instruct.getCallback();
+            this.instruct = instruct;
         }
 
 
@@ -72,6 +75,9 @@ public class OutOfTimeIntercept implements Interceptor {
 
         @Override
         public void run() {
+            // 失败 移除分发池中的指令
+            DriverManager.getInstance().removeInstruct(instruct);
+            // 回调超时异常
             callback.onError(new OutOfTimeError());
         }
     }

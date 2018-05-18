@@ -5,9 +5,11 @@ import android.content.Context;
 import org.usb.base.Client;
 import org.usb.driver.DriverManager;
 import org.usb.exception.DriverInitError;
+import org.usb.interceptor.HandshakeIntercept;
 import org.usb.interceptor.Interceptor;
 import org.usb.interceptor.OutOfTimeIntercept;
 import org.usb.interceptor.RealInterceptorChain;
+import org.usb.interceptor.RemoveInstructInterceptor;
 import org.usb.interceptor.RetryInterceptor;
 import org.usb.interceptor.WriteDataIntercept;
 
@@ -60,6 +62,12 @@ public class OkDriveClient implements Client {
 
         // 处理用户自定义的拦截器
         interceptors.addAll(P.interceptors);
+
+        // 添加移除指令的拦截器
+        interceptors.add(new RemoveInstructInterceptor());
+
+        // 添加握手的拦截器
+        interceptors.add(new HandshakeIntercept());
 
         // 添加超时的拦截器
         interceptors.add(new OutOfTimeIntercept(P.timeOut));

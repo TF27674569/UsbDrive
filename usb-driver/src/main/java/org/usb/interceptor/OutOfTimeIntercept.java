@@ -75,8 +75,6 @@ public class OutOfTimeIntercept implements Interceptor {
 
         @Override
         public void run() {
-            // 失败 移除分发池中的指令
-            DriverManager.getInstance().removeInstruct(instruct);
             // 回调超时异常
             callback.onError(new OutOfTimeError());
         }

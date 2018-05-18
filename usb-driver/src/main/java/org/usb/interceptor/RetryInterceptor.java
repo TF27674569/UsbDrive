@@ -90,9 +90,6 @@ public class RetryInterceptor implements Interceptor {
 
             // 如果执行完之后的重试次数大于给予的重试次数则回调异常
             callback.onError(new RetryTimeOutError());
-            // 移除分发池中的指令
-            DriverManager.getInstance().removeInstruct(instruct);
-
             // 关闭
             executorService.shutdown();
         }

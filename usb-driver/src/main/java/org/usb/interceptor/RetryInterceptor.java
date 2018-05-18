@@ -4,7 +4,7 @@ package org.usb.interceptor;
 import org.usb.Instruct;
 import org.usb.base.Callback;
 import org.usb.driver.DriverManager;
-import org.usb.exception.RetryTimeOutError;
+import org.usb.exception.RetryError;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -89,7 +89,7 @@ public class RetryInterceptor implements Interceptor {
             }
 
             // 如果执行完之后的重试次数大于给予的重试次数则回调异常
-            callback.onError(new RetryTimeOutError());
+            callback.onError(new RetryError());
             // 关闭
             executorService.shutdown();
         }

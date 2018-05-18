@@ -6,6 +6,7 @@ import org.usb.Instruct;
 import org.usb.base.Callback;
 import org.usb.driver.DriverManager;
 import org.usb.exception.OutOfTimeError;
+import org.usb.exception.RetryError;
 
 /**
  * Description : 超时拦截器
@@ -40,11 +41,12 @@ public class OutOfTimeIntercept implements Interceptor {
 
         private Callback callback;
         private Handler handler = new Handler();
-        private Instruct instruct;
+        // 重试时间
+        private long retryTimer;
 
-        public OutOfTimeCallback(Instruct instruct) {
+        private OutOfTimeCallback(Instruct instruct) {
             this.callback = instruct.getCallback();
-            this.instruct = instruct;
+            this.retryTimer = instruct.getRetyrCount() * instruct.getRetryTimer();
         }
 
 
@@ -66,10 +68,18 @@ public class OutOfTimeIntercept implements Interceptor {
          */
         @Override
         public void onError(Throwable throwable) {
-            callback.onError(throwable);
+            // 1. 判断后面抛出的是否是重试的异常,不是直接抛
+            // 2. 是重试的异常 判断用户给的时间满足超时 还 重试
+            //    重试： 如果是后面的异常先抛则 不抛这里的异常
+            //    超时： 如果后面的异常慢抛 则不抛后面的异常 以时间为判断条件
+
+            if (!(throwable instanceof RetryError)&&outTime > retryTimer){
+                handler.removeCallbacks(this);
+                callback.onError(throwable);
+            }
         }
 
-        public void onOutTime() {
+        private void onOutTime() {
             handler.postDelayed(this, outTime);
         }
 

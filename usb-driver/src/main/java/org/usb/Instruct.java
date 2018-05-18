@@ -30,12 +30,12 @@ public class Instruct {
     /**
      * 重试次数
      */
-    private int retyrCount;
+    private int retyrCount = 5;
 
     /**
      * 重试时间
      */
-    private long retryTimer;
+    private long retryTimer = 2000;
 
     public Instruct() {
     }

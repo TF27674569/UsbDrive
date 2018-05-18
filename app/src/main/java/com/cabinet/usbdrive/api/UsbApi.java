@@ -29,7 +29,7 @@ public interface UsbApi {
     @Adress(0x05)
     @Fun(0x06)
     @Log(Log.Logger.ON)
-    @Retry(0x05)
+    @Retry(value = 0x1,time = 3000)
     @End(0xfeff)
     @Intercept({-1,-2,10,10,9,10,10,-2,-1})
     Observable<byte[]> check();

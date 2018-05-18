@@ -1,6 +1,6 @@
 # usb转串口
 
-### **依赖 compile 'com.tianfeng:usbdriver:1.0.3'**
+### **依赖 compile 'com.tianfeng:usbdriver:1.0.7'**
 
 ### **一、仿okhttp解耦**
 1. 初始化

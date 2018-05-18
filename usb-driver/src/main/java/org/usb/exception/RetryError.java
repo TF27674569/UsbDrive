@@ -8,6 +8,10 @@ package org.usb.exception;
  * Email : 27674569@qq.com
  * Version : 1.0
  */
-public class RetryTimeOutError extends Exception{
+public class RetryError extends Exception{
+
+    public RetryError() {
+        super(" 重试错误！！！");
+    }
 
 }

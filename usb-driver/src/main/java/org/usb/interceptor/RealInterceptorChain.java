@@ -35,8 +35,10 @@ public class RealInterceptorChain implements Interceptor.Chain {
         // 到最后一个拦截器就不分发了
         if (index >= interceptors.size()) return;
 
-        index++;
-
+        // 分发任务
         interceptors.get(index).intercept(this);
+
+        // 任务角标++
+        index++;
     }
 }

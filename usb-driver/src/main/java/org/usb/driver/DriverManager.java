@@ -95,6 +95,7 @@ public class DriverManager implements Manager {
         // 设备初始化失败
         if (!uartInit) {
             return false;
+
         }
         //配置串口波特率
         isOpen = ch34xUARTDriver.SetConfig(BAUD_RATE, DATA_BIT, STOP_BIT, PARITY, FLOW_CONTROL);

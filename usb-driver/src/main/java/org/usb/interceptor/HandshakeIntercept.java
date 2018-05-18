@@ -19,7 +19,8 @@ public class HandshakeIntercept implements Interceptor{
     @Override
     public void intercept(Chain chain) {
         Instruct instruct = chain.instruct();
-
+        instruct.setCallback(new HandshakeCallback(instruct));
+        chain.proceed(instruct);
     }
 
     /**

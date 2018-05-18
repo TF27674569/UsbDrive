@@ -88,6 +88,13 @@ public class RetryInterceptor implements Interceptor {
                 count++;
             }
 
+            // 隔多久轮询一次
+            try {
+                Thread.sleep(80);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             // 如果执行完之后的重试次数大于给予的重试次数则回调异常
             callback.onError(new RetryError());
             // 关闭

@@ -42,8 +42,8 @@ public class RemoveInstructInterceptor implements Interceptor {
          */
         @Override
         public void onSuccess(byte[] result) {
-            callback.onSuccess(result);
             DriverManager.getInstance().removeInstruct(instruct);
+            callback.onSuccess(result);
         }
 
         /**
@@ -53,8 +53,8 @@ public class RemoveInstructInterceptor implements Interceptor {
          */
         @Override
         public void onError(Throwable throwable) {
-            callback.onError(throwable);
             DriverManager.getInstance().removeInstruct(instruct);
+            callback.onError(throwable);
         }
     }
 }

@@ -1,10 +1,14 @@
 package com.cabinet.usbdrive.api;
 
+import android.content.Context;
+
 import com.cabinet.usbdrive.App;
 
-import org.driver.UsbRetorfit;
-import org.driver.adapter.RxJava2CallAdapter;
-import org.usb.OkDriveClient;
+
+import org.usb.driver.OkUsbClient;
+import org.usb.retorfit.UsbRetorfit;
+import org.usb.retorfit.factory.OkUsbDriver;
+import org.usb.retorfit.factory.RxJava2CallAdapterFactory;
 
 /**
  * Description :
@@ -16,21 +20,20 @@ import org.usb.OkDriveClient;
  */
 public class UsbClient {
 
-    private static final UsbApi sUsbApi;
+    private static  UsbApi sUsbApi;
 
-    static {
+   public static void init(Context context){
+       OkUsbDriver client = new OkUsbDriver.Builder(context)
+               .timeOut(60000)
+               .build();
 
-        OkDriveClient client = new OkDriveClient.Builder(App.application)
-                .timeOut(60000)
-                .build();
+       UsbRetorfit usbRetorfit = new UsbRetorfit.Builder()
+               .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+               .addUsbDriver(client)
+               .build();
 
-        UsbRetorfit usbRetorfit = new UsbRetorfit.Builder()
-                .addCallAdapter(RxJava2CallAdapter.create())
-                .client(client)
-                .build();
-
-        sUsbApi = usbRetorfit.create(UsbApi.class);
-    }
+       sUsbApi = usbRetorfit.create(UsbApi.class);
+   }
 
 
     public static UsbApi getUsb() {

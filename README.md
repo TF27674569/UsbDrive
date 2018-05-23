@@ -1,6 +1,6 @@
 # usb转串口
 
-### **依赖 compile 'com.tianfeng:usbdriver:1.0.8'**
+### **依赖 compile 'com.tianfeng:usbdriver:1.0.11'**
 
 ### **一、仿okhttp解耦**
 1. 初始化
@@ -19,4 +19,4 @@
 3. 注意写指令和读取指令是以轮询的方式完成 通过handler发送命令轮询
 
 ### **二、图结构**
-![  ](https://github.com/TF27674569/UsbDrive/blob/master/driver.png)  
+![  ](https://github.com/TF27674569/UsbDrive/blob/master/org.usb.driver.png)  

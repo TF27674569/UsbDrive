@@ -23,9 +23,8 @@ public class UsbClient {
     private static  UsbApi sUsbApi;
 
    public static void init(Context context){
-       OkUsbDriver client = new OkUsbDriver.Builder(context)
-               .timeOut(60000)
-               .build();
+       OkUsbDriver client = new OkUsbDriver.Adapter(context)
+               .adapter();
 
        UsbRetorfit usbRetorfit = new UsbRetorfit.Builder()
                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())

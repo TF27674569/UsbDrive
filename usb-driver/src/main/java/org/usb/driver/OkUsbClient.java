@@ -4,11 +4,10 @@ import android.content.Context;
 
 import org.usb.driver.driver.DriverManager;
 import org.usb.driver.error.DriverInitError;
-import org.usb.driver.interceptor.HandshakeInterceptor;
 import org.usb.driver.interceptor.OutOfTimeIntercept;
 import org.usb.driver.interceptor.RealInterceptorChain;
 import org.usb.driver.interceptor.RemoveInstructInterceptor;
-import org.usb.driver.interceptor.RetryInterceptor;
+import org.usb.driver.interceptor.CountInterceptor;
 import org.usb.driver.interceptor.WriteDataIntercept;
 import org.usb.driver.template.Client;
 import org.usb.driver.template.Interceptor;
@@ -62,17 +61,16 @@ public class OkUsbClient implements Client {
         // 处理用户自定义的拦截器
         interceptors.addAll(P.interceptors);
 
+        // 添加重试的拦截器
+        if (P.isAddCount) {
+            interceptors.add(new CountInterceptor());
+        }
+
         // 添加移除指令的拦截器
         interceptors.add(new RemoveInstructInterceptor());
 
         // 添加超时的拦截器
         interceptors.add(new OutOfTimeIntercept(P.timeOut));
-
-        // 添加握手的拦截器
-        interceptors.add(new HandshakeInterceptor());
-
-        // 添加重试的拦截器
-        interceptors.add(new RetryInterceptor());
 
         // 添加发送指令的拦截器
         interceptors.add(new WriteDataIntercept());
@@ -89,8 +87,10 @@ public class OkUsbClient implements Client {
 
         private List<Interceptor> interceptors;
         private Context context;
-        // 超时时间默认20秒
-        private long timeOut = 20000;
+        // 超时时间默认1秒
+        private long timeOut = 1000;
+
+        private boolean isAddCount = true;
 
         public Builder(Context context) {
             this.context = context.getApplicationContext();
@@ -104,6 +104,11 @@ public class OkUsbClient implements Client {
 
         public Builder timeOut(long timeOut) {
             this.timeOut = timeOut;
+            return this;
+        }
+
+        public Builder isAddCountInterceptor(boolean isAdd) {
+            this.isAddCount = isAdd;
             return this;
         }
 

@@ -4,6 +4,8 @@ import android.os.Handler;
 
 import org.usb.driver.Instruct;
 
+import java.util.List;
+
 /**
  * Description : 拦截器
  * <p/>
@@ -13,20 +15,19 @@ import org.usb.driver.Instruct;
  * Version : 1.0
  */
 public interface Interceptor {
-    // 超时what
-    int WHAT_OUT_OF_TIME = 1;
-    // 重试what
-    int WHAT_RETRY = 2;
-
-    // 多次实例化也只会用这一个handler发送 callback不一样
-    static final Handler INTERCEPTOR_HANDLER = new Handler();
 
     /**
      * 拦截操作
      */
     void intercept(Chain chain);
 
+
     interface Chain {
+
+        /**
+         * 所有拦截器
+         */
+        List<Interceptor> interceptors();
 
         /**
          * 获取任务

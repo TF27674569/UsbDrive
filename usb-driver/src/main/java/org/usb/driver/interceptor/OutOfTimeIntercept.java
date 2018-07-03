@@ -1,5 +1,6 @@
 package org.usb.driver.interceptor;
 
+import android.os.Handler;
 import android.os.Message;
 
 import org.usb.driver.Instruct;
@@ -17,6 +18,9 @@ import org.usb.driver.template.Interceptor;
  */
 public class OutOfTimeIntercept implements Interceptor {
 
+    private static Handler mHandler = new Handler();
+
+    // 超时时间
     private long outTime;
 
     public OutOfTimeIntercept(long outTime) {
@@ -38,6 +42,7 @@ public class OutOfTimeIntercept implements Interceptor {
 
     class OutOfTimeCallback extends CallbackAdapter implements Runnable {
 
+        private boolean mIsCallError;
 
         protected OutOfTimeCallback(Instruct instruct) {
             super(instruct);
@@ -50,7 +55,7 @@ public class OutOfTimeIntercept implements Interceptor {
          */
         @Override
         public void onSuccess(byte[] result) {
-            INTERCEPTOR_HANDLER.removeMessages(WHAT_OUT_OF_TIME);
+            mHandler.removeCallbacks(this);
             callback.onSuccess(result);
         }
 
@@ -61,30 +66,22 @@ public class OutOfTimeIntercept implements Interceptor {
          */
         @Override
         public void onError(Throwable throwable) {
-            INTERCEPTOR_HANDLER.removeMessages(WHAT_OUT_OF_TIME);
-            callback.onError(throwable);
+            mHandler.removeCallbacks(this);
+            if (!mIsCallError) {
+                callback.onError(throwable);
+            }
         }
 
         /**
          * 重试等待
          */
         private void onOutTime() {
-            Message obtain = Message.obtain(INTERCEPTOR_HANDLER, this);
-            obtain.what = WHAT_OUT_OF_TIME;
-            INTERCEPTOR_HANDLER.sendMessageDelayed(obtain, outTime);
+            mHandler.postDelayed(this, outTime);
         }
 
         @Override
         public void run() {
-
-            // 如果此时重试还没有结束
-            if (INTERCEPTOR_HANDLER.hasMessages(WHAT_RETRY)) {
-
-                // 先结束重试
-                INTERCEPTOR_HANDLER.removeMessages(WHAT_RETRY);
-            }
-
-            // 回调超时异常
+            mIsCallError = true;
             callback.onError(new OutOfTimeError());
         }
     }

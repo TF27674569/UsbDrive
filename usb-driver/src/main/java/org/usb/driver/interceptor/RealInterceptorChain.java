@@ -27,6 +27,14 @@ public class RealInterceptorChain implements Interceptor.Chain {
 
 
     /**
+     * 所有拦截器
+     */
+    @Override
+    public List<Interceptor> interceptors() {
+        return interceptors;
+    }
+
+    /**
      * 获取任务
      */
     @Override

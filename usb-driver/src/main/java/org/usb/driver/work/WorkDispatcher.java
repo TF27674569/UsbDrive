@@ -18,6 +18,7 @@ import static org.usb.driver.config.InstructConfig.DATA_LENGTH;
 import static org.usb.driver.config.InstructConfig.END_SIZE;
 import static org.usb.driver.config.InstructConfig.FUNCTION_CODE_SIZE;
 import static org.usb.driver.config.InstructConfig.HEAD_SIZE;
+import static org.usb.driver.config.InstructConfig.LENGTH_LENGTH;
 import static org.usb.driver.config.InstructConfig.LOG_LENGTH;
 
 
@@ -31,7 +32,7 @@ import static org.usb.driver.config.InstructConfig.LOG_LENGTH;
  */
 public class WorkDispatcher implements Handler.Callback {
 
-    //数据长度位置
+    //数据长度位置                    地址 功能码  日志 长度 数据 动作 count
     private static final int DATA_LENGTH_INDEX = HEAD_SIZE + ADDRESS_SIZE + FUNCTION_CODE_SIZE + LOG_LENGTH;
     //数据的基础长度值
     private static final int PACKAGE_BASE_LENGTH = DATA_LENGTH_INDEX + DATA_LENGTH + END_SIZE;

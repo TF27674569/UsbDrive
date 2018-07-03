@@ -41,5 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
+        // 也就是说，子线程做耗时任务得到结果了，通过主线程的handler 将消息放在主线程的队列，looper 取出调用
+
     }
 }

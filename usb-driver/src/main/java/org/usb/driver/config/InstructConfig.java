@@ -23,6 +23,8 @@ public class InstructConfig {
     public static int FUNCTION_CODE_SIZE = 1;
     //日志长度
     public static int LOG_LENGTH = 1;
+    //日志长度
+    public static int LENGTH_LENGTH = 1;
     // 版本号长度
     public static int VERSION_CODE_SIZE = 2;
     // 当前大小

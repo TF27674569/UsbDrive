@@ -132,7 +132,7 @@ public class WorkDispatcher implements Handler.Callback {
         if (instruct.length < PACKAGE_BASE_LENGTH) return;
 
         // 表示数据有问题 包头不对
-        if (instruct[0] != -1 || instruct[1] == -2) {
+        if (instruct[0] != -1 || instruct[1] != -2) {
             // 舍弃第一位
             instruct = Arrays.copyOfRange(instruct, 1, instruct.length);
             // 重新判断

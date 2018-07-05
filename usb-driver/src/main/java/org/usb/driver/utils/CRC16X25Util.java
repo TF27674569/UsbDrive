@@ -29,7 +29,6 @@ public final class CRC16X25Util {
      * 为Byte数组最后添加两位CRC校验
      *
      * @param buf（验证的byte数组）
-     * @return
      */
     public static byte[] setParamCRC(byte[] buf) {
         int checkCode = 0;
@@ -41,10 +40,7 @@ public final class CRC16X25Util {
         return concatAll(buf, crcByte);
     }
 
-    /**
-     * @param bytes
-     * @return
-     */
+
     public static int crc_16_X25(byte[] bytes) {
         int crc_reg = 0xFFFF;
         for (int i = 0; i < bytes.length; i++) {
@@ -59,7 +55,6 @@ public final class CRC16X25Util {
      *
      * @param srcByte
      * @param length(验证码字节长度)
-     * @return
      */
     public static boolean isPassCRC(byte[] srcByte, int length) {
 
@@ -78,9 +73,6 @@ public final class CRC16X25Util {
 
     /**
      * 对buf中offset以前crcLen长度的字节作crc校验，返回校验结果
-     *
-     * @param buf
-     * @param crcLen
      */
     private static int calcCRC(byte[] buf, int offset, int crcLen) {
         int crc_reg = 0xFFFF;
@@ -94,10 +86,6 @@ public final class CRC16X25Util {
 
     /**
      * 多个数组合并
-     *
-     * @param first
-     * @param rest
-     * @return
      */
     public static byte[] concatAll(byte[] first, byte[]... rest) {
         int totalLength = first.length;

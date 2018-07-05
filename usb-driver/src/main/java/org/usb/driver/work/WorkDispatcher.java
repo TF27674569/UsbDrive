@@ -39,7 +39,7 @@ public class WorkDispatcher implements Handler.Callback {
     private static final int READ_BYTE_SIZE = 100;
 
     // 每次读取的指令
-    private static byte[] sInstructBuffer = new byte[READ_BYTE_SIZE];
+    private byte[] sInstructBuffer;
     // 清空 sInstructBuffer 每次擦除的值
     private static byte sWipe = 0;
 
@@ -101,7 +101,7 @@ public class WorkDispatcher implements Handler.Callback {
      */
     private void pooling(Message msg) {
         // 擦除缓冲的值
-        Arrays.fill(sInstructBuffer, sWipe);
+       sInstructBuffer = new byte[READ_BYTE_SIZE];
         // 读取长度
         int length = DriverManager.getInstance().driver().ReadData(sInstructBuffer, READ_BYTE_SIZE);
         if (length > 0) {
@@ -112,6 +112,9 @@ public class WorkDispatcher implements Handler.Callback {
                     sInstructBuffer = CRC16X25Util.concatAll(sPartData, sInstructBuffer);
                     sPartData = null;
                 }
+
+                Utils.printHex(sInstructBuffer, "接收到的数据:");
+
                 handleInstruct(sInstructBuffer);
             }
         }
@@ -125,9 +128,6 @@ public class WorkDispatcher implements Handler.Callback {
      * 解析指令
      */
     private void handleInstruct(byte[] instruct) {
-
-        Utils.printHex(instruct, "接收到的数据:");
-
         // 不是一个合法的包
         if (instruct.length < PACKAGE_BASE_LENGTH) return;
 
@@ -173,6 +173,8 @@ public class WorkDispatcher implements Handler.Callback {
         // 成功
         if (passCRC) {
             circulationData(packageData);//校验通过
+            // 丢掉已经成功的数据
+            instruct = Arrays.copyOfRange(instruct, packageData.length, dataLength);
         }
         Utils.printHex(packageData, "校验数据:" + passCRC);
 

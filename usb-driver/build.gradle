@@ -48,7 +48,7 @@ publish{
     userOrg = 'tf27674569'//bintray.com的用户名
     groupId = 'com.tianfeng'//jcenter上的路径
     artifactId = 'usbdriver'//项目名称
-    publishVersion = '1.0.11'//版本号
+    publishVersion = '1.0.14'//版本号
     desc = '串口通信'//描述，不重要
     website = siteUrl//项目主页
 }

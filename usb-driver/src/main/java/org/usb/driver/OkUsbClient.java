@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.usb.driver.driver.DriverManager;
 import org.usb.driver.error.DriverInitError;
+import org.usb.driver.interceptor.CrcInterceptor;
 import org.usb.driver.interceptor.OutOfTimeIntercept;
 import org.usb.driver.interceptor.RealInterceptorChain;
 import org.usb.driver.interceptor.RemoveInstructInterceptor;
@@ -62,7 +63,7 @@ public class OkUsbClient implements Client {
         interceptors.addAll(P.interceptors);
 
         // 添加重试的拦截器
-        if (P.isAddCount) {
+        if (P.isAddCount){
             interceptors.add(new CountInterceptor());
         }
 
@@ -71,6 +72,9 @@ public class OkUsbClient implements Client {
 
         // 添加超时的拦截器
         interceptors.add(new OutOfTimeIntercept(P.timeOut));
+
+        // crc校验添加
+        interceptors.add(new CrcInterceptor());
 
         // 添加发送指令的拦截器
         interceptors.add(new WriteDataIntercept());

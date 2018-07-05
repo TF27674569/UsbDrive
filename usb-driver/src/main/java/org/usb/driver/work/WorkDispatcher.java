@@ -168,7 +168,7 @@ public class WorkDispatcher implements Handler.Callback {
 
         // 数据正常的情况下
         //CRC校验部分
-        boolean passCRC = CRC16X25Util.isPassCRC(packageData, dataLength);
+        boolean passCRC = CRC16X25Util.isPassCRC(packageData, dataLength - 2);
 
         // 成功
         if (passCRC) {

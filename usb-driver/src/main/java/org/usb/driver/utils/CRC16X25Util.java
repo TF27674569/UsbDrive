@@ -53,8 +53,7 @@ public final class CRC16X25Util {
     /***
      * CRC校验是否通过
      *
-     * @param srcByte
-     * @param length(验证码字节长度)
+     * @param length (验证码字节长度)
      */
     public static boolean isPassCRC(byte[] srcByte, int length) {
 

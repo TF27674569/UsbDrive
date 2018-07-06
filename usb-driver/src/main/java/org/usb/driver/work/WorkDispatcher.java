@@ -38,8 +38,6 @@ public class WorkDispatcher implements Handler.Callback {
     private static final int PACKAGE_BASE_LENGTH = DATA_LENGTH_INDEX + DATA_LENGTH + END_SIZE;
     private static final int READ_BYTE_SIZE = 100;
 
-    // 每次读取的指令
-    private byte[] sInstructBuffer;
     // 清空 sInstructBuffer 每次擦除的值
     private static byte sWipe = 0;
 
@@ -100,22 +98,22 @@ public class WorkDispatcher implements Handler.Callback {
      * 轮询读数据
      */
     private void pooling(Message msg) {
-        // 擦除缓冲的值
-       sInstructBuffer = new byte[READ_BYTE_SIZE];
+        // 缓冲池读取大小
+        byte[] buffer = new byte[READ_BYTE_SIZE];
         // 读取长度
-        int length = DriverManager.getInstance().driver().ReadData(sInstructBuffer, READ_BYTE_SIZE);
+        int length = DriverManager.getInstance().driver().ReadData(buffer, READ_BYTE_SIZE);
         if (length > 0) {
             //截取数组有效长度
-            sInstructBuffer = Arrays.copyOfRange(sInstructBuffer, 0, length);
-            if (sInstructBuffer.length > PACKAGE_BASE_LENGTH) {
+            buffer = Arrays.copyOfRange(buffer, 0, length);
+            if (buffer.length > PACKAGE_BASE_LENGTH) {
                 if (sPartData != null) {
-                    sInstructBuffer = CRC16X25Util.concatAll(sPartData, sInstructBuffer);
+                    buffer = CRC16X25Util.concatAll(sPartData, buffer);
                     sPartData = null;
                 }
 
-                Utils.printHex(sInstructBuffer, "接收到的数据:");
+                Utils.printHex(buffer, "接收到的数据:");
 
-                handleInstruct(sInstructBuffer);
+                handleInstruct(buffer);
             }
         }
         // 接着轮询遍历

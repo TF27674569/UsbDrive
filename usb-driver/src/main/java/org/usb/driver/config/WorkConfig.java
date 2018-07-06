@@ -23,7 +23,7 @@ public final class WorkConfig {
     // 轮询读数据
     public static final int POLLING = 0x05;
     // 延时时间
-    public static final long DELAYED_TIME = 300L;
+    public static long POLLING_TIME = 100L;
 
 
 

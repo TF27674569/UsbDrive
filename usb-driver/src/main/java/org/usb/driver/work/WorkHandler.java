@@ -54,7 +54,7 @@ public class WorkHandler extends Handler implements Work {
         Message message = Message.obtain();
         message.obj = this;
         message.what = WorkConfig.POLLING;
-        sendMessageDelayed(message, WorkConfig.DELAYED_TIME);
+        sendMessageDelayed(message, WorkConfig.POLLING_TIME);
     }
 
     /**

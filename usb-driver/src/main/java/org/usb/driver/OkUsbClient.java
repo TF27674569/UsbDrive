@@ -2,6 +2,7 @@ package org.usb.driver;
 
 import android.content.Context;
 
+import org.usb.driver.config.WorkConfig;
 import org.usb.driver.driver.DriverManager;
 import org.usb.driver.error.DriverInitError;
 import org.usb.driver.interceptor.CrcInterceptor;
@@ -25,6 +26,13 @@ import java.util.List;
  * Version : 1.0
  */
 public class OkUsbClient implements Client {
+
+    /**
+     * 设置轮训之间的间隔
+     */
+    public static void initPollingTime(long time) {
+        WorkConfig.POLLING_TIME = time;
+    }
 
     private Builder P;
 
@@ -63,7 +71,7 @@ public class OkUsbClient implements Client {
         interceptors.addAll(P.interceptors);
 
         // 添加重试的拦截器
-        if (P.isAddCount){
+        if (P.isAddCount) {
             interceptors.add(new CountInterceptor());
         }
 
@@ -71,7 +79,7 @@ public class OkUsbClient implements Client {
         interceptors.add(new RemoveInstructInterceptor());
 
         // 添加超时的拦截器
-        interceptors.add(new OutOfTimeIntercept(P.timeOut,P.isAddCount));
+        interceptors.add(new OutOfTimeIntercept(P.timeOut, P.isAddCount));
 
         // crc校验添加
         interceptors.add(new CrcInterceptor());

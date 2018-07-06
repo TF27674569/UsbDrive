@@ -7,6 +7,7 @@ import org.usb.driver.template.Callback;
 import org.usb.driver.template.CallbackAdapter;
 import org.usb.driver.template.Interceptor;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,7 +28,18 @@ public class CountInterceptor implements Interceptor {
     /**
      * 最大发起次数
      */
-    private static final int MAX_COUNT = 5;
+    private int mMaxCount;
+    /**
+     * 当前发送的count
+     */
+    private byte mCurrentCount = 1;
+
+    /**
+     * 与外部联系的callback
+     * 防止打断链接之后回调停止在内部CountCallback里面
+     * 从而结果不能回调
+     */
+    private Callback mSuperCallback;
 
     /**
      * 拦截操作
@@ -41,8 +53,19 @@ public class CountInterceptor implements Interceptor {
         // 重定义新的拦截器
         List<Interceptor> redefineInterceptors = redefineInterceptor(chain);
 
+        // 链接外部的callback
+        // 打断链接之后在分发就不赋值了
+        // 表示第一次进
+        if (mSuperCallback == null) {
+            mSuperCallback = instruct.getCallback();
+            // 第一次进来没有进入crc 直接改count值 第一次肯定是1
+            instruct.getSend()[3] = mCurrentCount;
+            // zui大count次数拿一次就够了
+            mMaxCount = instruct.getRetyrCount();
+        }
+
         // 修改回调为代理回调
-        RetryCallback callback = new RetryCallback(instruct, redefineInterceptors);
+        CountCallback callback = new CountCallback(instruct, redefineInterceptors);
 
         // 代理callback
         instruct.setCallback(callback);
@@ -63,7 +86,7 @@ public class CountInterceptor implements Interceptor {
         int index = targetInterceptors.indexOf(this);
 
         // 获取自己往后的拦截器集合
-        return targetInterceptors.subList(index + 1, targetInterceptors.size());
+        return targetInterceptors.subList(index, targetInterceptors.size());
     }
 
 
@@ -76,12 +99,7 @@ public class CountInterceptor implements Interceptor {
      * 2. 轮询就已超时的1秒为基准 error 一次 轮训一次 count+1
      * 3. 动作的监听在 onSuccess里面
      */
-    class RetryCallback extends CallbackAdapter {
-
-        /**
-         * 当前发送的count
-         */
-        private byte count = 1;
+    class CountCallback extends CallbackAdapter {
 
         /**
          * 发送指令
@@ -93,18 +111,18 @@ public class CountInterceptor implements Interceptor {
          */
         private List<Interceptor> interceptors;
 
-        private RetryCallback(Instruct instruct, List<Interceptor> interceptors) {
+        private CountCallback(Instruct instruct, List<Interceptor> interceptors) {
             super(instruct);
             this.instruct = instruct;
             // 保证最后回调在这里
-            instruct.setCallback(this);
+            this.instruct.setCallback(this);
             this.interceptors = interceptors;
         }
 
         @Override
         public void onSuccess(byte[] result) {
             // 动作角标
-            int anctionIndex = result.length - 1 - 6;
+            int anctionIndex = result.length - 6;
 
             // 动作
             byte action = result[anctionIndex];
@@ -112,7 +130,7 @@ public class CountInterceptor implements Interceptor {
             // 数据接收没毛病
             if (action == 3) {
                 // 回调成功
-                super.onSuccess(result);
+                mSuperCallback.onSuccess(result);
                 // 还需要发一个4给单片机
                 action();
                 withInterceptorChain();
@@ -127,12 +145,12 @@ public class CountInterceptor implements Interceptor {
             /**
              * 如果是超时且count 在 最大次数之内
              */
-            if (throwable instanceof OutOfTimeError && count <= MAX_COUNT) {
-                count++;
+            if (throwable instanceof OutOfTimeError && mCurrentCount < mMaxCount) {
+                mCurrentCount++;
                 count();
                 withInterceptorChain();
             } else {
-                super.onError(throwable);
+                mSuperCallback.onError(throwable);
             }
         }
 
@@ -140,8 +158,10 @@ public class CountInterceptor implements Interceptor {
          * 修改动作这里没有加crc校验
          */
         private void action() {
-            byte[] send = instruct.getSend();
-            send[send.length - 2] = 4;
+            // 发送之后的指令被crc拦截器 加了两位校验码
+            byte[] send = Arrays.copyOfRange(instruct.getSend(), 0, instruct.getSend().length - 2);
+            // 还有包尾两个字节  count一个字节
+            send[send.length - 4] = 4;
             instruct.setSend(send);
             instruct.setCallback(Callback.DEFAULE_CALLBACK);
         }
@@ -150,8 +170,10 @@ public class CountInterceptor implements Interceptor {
          * 修改指令 这里没有加crc校验
          */
         private void count() {
-            byte[] send = instruct.getSend();
-            send[send.length - 1] = count;
+            // 发送之后的指令被crc拦截器 加了两位校验码
+            byte[] send = Arrays.copyOfRange(instruct.getSend(), 0, instruct.getSend().length - 2);
+            // 还有包尾两个字节
+            send[send.length - 3] = mCurrentCount;
             instruct.setSend(send);
         }
 

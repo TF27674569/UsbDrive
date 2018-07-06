@@ -71,7 +71,7 @@ public class OkUsbClient implements Client {
         interceptors.add(new RemoveInstructInterceptor());
 
         // 添加超时的拦截器
-        interceptors.add(new OutOfTimeIntercept(P.timeOut));
+        interceptors.add(new OutOfTimeIntercept(P.timeOut,P.isAddCount));
 
         // crc校验添加
         interceptors.add(new CrcInterceptor());

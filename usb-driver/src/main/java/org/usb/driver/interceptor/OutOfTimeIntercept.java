@@ -22,14 +22,24 @@ public class OutOfTimeIntercept implements Interceptor {
 
     // 超时时间
     private long outTime;
+    // 是否添加了count
+    private boolean mIsAddCount;
 
-    public OutOfTimeIntercept(long outTime) {
+    public OutOfTimeIntercept(long outTime,boolean isAddCount) {
         this.outTime = outTime;
+        this.mIsAddCount = isAddCount;
     }
 
     @Override
     public void intercept(Chain chain) {
+
         Instruct instruct = chain.instruct();
+
+        // 有count注解 以count注解的超时时间为准
+        if (mIsAddCount){
+            outTime = instruct.getRetryTimer();
+        }
+
         // 重置callback
         OutOfTimeCallback outOfTimeCallback = new OutOfTimeCallback(instruct);
         // 代理callback

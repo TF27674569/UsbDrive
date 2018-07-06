@@ -75,6 +75,12 @@ public class WorkDispatcher implements Handler.Callback {
         }
         // 发送指令
         byte[] sendInstruct = obj.getSend();
+
+        // 指令对象为null不用写
+        // 为了单纯添加一个拦截指令的拦截器
+        if (sendInstruct == null) {
+            return;
+        }
         // 拿到发送的指令
         int real = DriverManager.getInstance().driver().WriteData(sendInstruct, sendInstruct.length);
 

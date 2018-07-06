@@ -127,16 +127,24 @@ public class CountInterceptor implements Interceptor {
             // 动作
             byte action = result[anctionIndex];
 
-            // 数据接收没毛病
-            if (action == 3) {
-                // 回调成功
-                mSuperCallback.onSuccess(result);
-                // 还需要发一个4给单片机
-                action();
-                withInterceptorChain();
+            switch (action) {
+                // 握手成功
+                // 但是此时已经没有回调了 在链子里面没移除掉了
+                case 2:
+                    // 指令置为null 单纯拦截
+                    instruct.setSend(null);
+                    // 重新调起责任连
+                    withInterceptorChain();
+                    break;
+                // 数据接收没毛病
+                case 3:
+                    // 回调成功
+                    mSuperCallback.onSuccess(result);
+                    // 还需要发一个4给单片机
+                    action();
+                    withInterceptorChain();
+                    break;
             }
-
-
         }
 
 

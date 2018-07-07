@@ -180,8 +180,9 @@ public class WorkDispatcher implements Handler.Callback {
 
         // 判断包尾
         if (packageData[dataLength - 3] != -1 || packageData[dataLength - 4] != -2) {
-            // 包尾不对拼接上来后下次重新执行
-            sPartData = instruct;
+            // 包尾不对拼接上来后下次重新执行(连接上可能死循环，因为每次都能检验过，但是截取的包尾又不对)
+            // 这里把这个指令丢掉
+            // sPartData = instruct;
             return;
         }
 

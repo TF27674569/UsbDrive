@@ -129,7 +129,7 @@ public class CountInterceptor implements Interceptor {
 
             switch (action) {
                 // 握手成功
-                // 但是此时已经没有回调了 在链子里面没移除掉了
+                // 但是此时已经没有回调了 在链子里面被移除掉了
                 case 2:
                     // 指令置为null 单纯拦截
                     instruct.setSend(null);

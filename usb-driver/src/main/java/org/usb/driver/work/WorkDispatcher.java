@@ -36,10 +36,7 @@ public class WorkDispatcher implements Handler.Callback {
     private static final int DATA_LENGTH_INDEX = HEAD_SIZE + ADDRESS_SIZE + FUNCTION_CODE_SIZE + LOG_LENGTH;
     //数据的基础长度值
     private static final int PACKAGE_BASE_LENGTH = DATA_LENGTH_INDEX + DATA_LENGTH + END_SIZE;
-    private static final int READ_BYTE_SIZE = 100;
-
-    // 清空 sInstructBuffer 每次擦除的值
-    private static byte sWipe = 0;
+    private static final int READ_BYTE_SIZE = 128;
 
     // 指令集合
     private static List<Instruct> sInstruct = new ArrayList<>();
@@ -113,6 +110,7 @@ public class WorkDispatcher implements Handler.Callback {
             buffer = Arrays.copyOfRange(buffer, 0, length);
             if (buffer.length > PACKAGE_BASE_LENGTH) {
                 if (sPartData != null) {
+                    // 拼接上之前剩下的指令
                     buffer = CRC16X25Util.concatAll(sPartData, buffer);
                     sPartData = null;
                 }
@@ -120,6 +118,8 @@ public class WorkDispatcher implements Handler.Callback {
                 Utils.printHex(buffer, "接收到的数据:");
 
                 handleInstruct(buffer);
+            } else {
+                partData(buffer);
             }
         }
         // 接着轮询遍历
@@ -127,13 +127,28 @@ public class WorkDispatcher implements Handler.Callback {
         handler.polling();
     }
 
+    /**
+     * 余留指令
+     */
+    private void partData(byte[] instruct){
+        // 不够一个包长 留着下一次轮训使用
+        if (sPartData != null) {
+            // 拼接上之前剩下的指令
+            sPartData = CRC16X25Util.concatAll(sPartData, instruct);
+        } else {
+            sPartData = instruct;
+        }
+    }
 
     /**
      * 解析指令
      */
     private void handleInstruct(byte[] instruct) {
         // 不是一个合法的包
-        if (instruct.length < PACKAGE_BASE_LENGTH) return;
+        if (instruct.length < PACKAGE_BASE_LENGTH){
+            partData(instruct);
+            return;
+        }
 
         // 表示数据有问题 包头不对
         if (instruct[0] != -1 || instruct[1] != -2) {

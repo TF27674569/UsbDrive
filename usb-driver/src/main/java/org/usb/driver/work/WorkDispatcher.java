@@ -118,8 +118,6 @@ public class WorkDispatcher implements Handler.Callback {
                 Utils.printHex(buffer, "接收到的数据:");
 
                 handleInstruct(buffer);
-            } else {
-                partData(buffer);
             }
         }
         // 接着轮询遍历
@@ -127,18 +125,6 @@ public class WorkDispatcher implements Handler.Callback {
         handler.polling();
     }
 
-    /**
-     * 余留指令
-     */
-    private void partData(byte[] instruct){
-        // 不够一个包长 留着下一次轮训使用
-        if (sPartData != null) {
-            // 拼接上之前剩下的指令
-            sPartData = CRC16X25Util.concatAll(sPartData, instruct);
-        } else {
-            sPartData = instruct;
-        }
-    }
 
     /**
      * 解析指令
@@ -146,7 +132,7 @@ public class WorkDispatcher implements Handler.Callback {
     private void handleInstruct(byte[] instruct) {
         // 不是一个合法的包
         if (instruct.length < PACKAGE_BASE_LENGTH){
-            partData(instruct);
+            sPartData = instruct;
             return;
         }
 
@@ -193,10 +179,12 @@ public class WorkDispatcher implements Handler.Callback {
         // 成功
         if (passCRC) {
             circulationData(packageData);//校验通过
-            // 丢掉已经成功的数据
-            instruct = Arrays.copyOfRange(instruct, packageData.length, dataLength);
         }
-        Utils.printHex(packageData, "校验数据:" + passCRC);
+
+        Utils.printHex(packageData, "校验数据:  " + passCRC);
+
+        // 丢掉已经使用过了的数据
+        instruct = Arrays.copyOfRange(instruct, packageData.length, dataLength);
 
         // 表示还够一个包
         if (instruct.length > dataLength + PACKAGE_BASE_LENGTH) {
